@@ -3,3 +3,4 @@
 alpha_x_v2.db
 .streamlit/secrets.toml
 .env
+.DS_Store
