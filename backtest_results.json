@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-05-12T02:05:40",
+  "horizon_days": 60,
+  "method": {
+    "stock_pool_size": 101,
+    "stock_pool_desc": "台股市值前 100 + AI 伺服器 + 高股息 ETF + 電動車供應鏈",
+    "frequency": "每月第一個交易日掃描",
+    "horizon": "60 個交易日固定持有（不停損不停利）",
+    "cost_assumption": "滑價 0.3% + 手續費 0.1425% + 賣稅 0.3%",
+    "baseline": "0050 同期等權持有",
+    "lookahead_protection": "時光機切片 + 隔日開盤買進 + 跳過基本面"
+  },
+  "summary": {
+    "months": 3,
+    "total_signals": 0,
+    "win_rate_pct": 0,
+    "avg_return_pct": 0,
+    "baseline_avg_return_pct": 23.57,
+    "alpha_pct": -23.57,
+    "avg_win_pct": 0,
+    "avg_loss_pct": 0,
+    "payoff_ratio": null,
+    "max_single_gain_pct": 0,
+    "max_single_loss_pct": 0,
+    "max_consecutive_losing_months": 0,
+    "cagr_pct": 0
+  },
+  "by_month": [
+    {
+      "month": "2025-12",
+      "target_date": "2025-12-01",
+      "signal_count": 0,
+      "avg_return_pct": 0.0,
+      "win_rate_pct": 0.0,
+      "baseline_return_pct": 19.35,
+      "alpha_pct": -19.35,
+      "picks": []
+    },
+    {
+      "month": "2026-01",
+      "target_date": "2026-01-01",
+      "signal_count": 0,
+      "avg_return_pct": 0.0,
+      "win_rate_pct": 0.0,
+      "baseline_return_pct": 20.18,
+      "alpha_pct": -20.18,
+      "picks": []
+    },
+    {
+      "month": "2026-02",
+      "target_date": "2026-02-02",
+      "signal_count": 0,
+      "avg_return_pct": 0.0,
+      "win_rate_pct": 0.0,
+      "baseline_return_pct": 31.17,
+      "alpha_pct": -31.17,
+      "picks": []
+    }
+  ]
+}
