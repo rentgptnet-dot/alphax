@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T02:05:40",
+  "generated_at": "2026-05-12T22:13:59",
   "horizon_days": 60,
   "method": {
     "stock_pool_size": 101,
@@ -15,8 +15,8 @@
     "total_signals": 0,
     "win_rate_pct": 0,
     "avg_return_pct": 0,
-    "baseline_avg_return_pct": 23.57,
-    "alpha_pct": -23.57,
+    "baseline_avg_return_pct": 23.55,
+    "alpha_pct": -23.55,
     "avg_win_pct": 0,
     "avg_loss_pct": 0,
     "payoff_ratio": null,
@@ -52,8 +52,8 @@
       "signal_count": 0,
       "avg_return_pct": 0.0,
       "win_rate_pct": 0.0,
-      "baseline_return_pct": 31.17,
-      "alpha_pct": -31.17,
+      "baseline_return_pct": 31.11,
+      "alpha_pct": -31.11,
       "picks": []
     }
   ]
