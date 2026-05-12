@@ -122,10 +122,12 @@ def load_backtest() -> dict | None:
 
 
 @st.cache_data(ttl=60 * 30, show_spinner=False)
-def scan_today() -> tuple[str, str, list[dict]]:
+def scan_today() -> tuple[str, str, list[dict], list[dict]]:
+    """回傳 (regime, regime_msg, L2_picks, L1_picks)。"""
     validator = GlobalValidator()
     universe = build_dashboard_universe()
-    picks: list[dict] = []
+    l2_picks: list[dict] = []
+    l1_picks: list[dict] = []
     regime, regime_msg = "UNKNOWN", "—"
 
     for sym in universe:
@@ -139,15 +141,18 @@ def scan_today() -> tuple[str, str, list[dict]]:
                 if "TWII" in r or "200" in r:
                     regime_msg = r
                     break
+        item = {
+            "symbol": res.symbol,
+            "label": res.label,
+            "price": res.current_price,
+            "rs_90d": res.extras.get("RS_90D_%"),
+            "reasons": res.reasons,
+        }
         if "L2" in res.label:
-            picks.append({
-                "symbol": res.symbol,
-                "label": res.label,
-                "price": res.current_price,
-                "rs_90d": res.extras.get("RS_90D_%"),
-                "reasons": res.reasons,
-            })
-    return regime, regime_msg, picks
+            l2_picks.append(item)
+        elif "L1" in res.label:
+            l1_picks.append(item)
+    return regime, regime_msg, l2_picks, l1_picks
 
 
 # ============================================================
@@ -370,8 +375,12 @@ def main():
                 st.cache_data.clear()
                 st.rerun()
         with st.spinner("掃描台股 ~100 檔中..."):
-            regime, regime_msg, picks = scan_today()
-        render_today_section(picks)
+            regime, regime_msg, l2_picks, l1_picks = scan_today()
+        if l2_picks:
+            render_today_section(l2_picks)
+        else:
+            st.warning(f"⚠️ 今日無個股通過全部條件（L2 = 0）。改顯示 L1 觀察名單（{len(l1_picks)} 檔）。")
+            render_today_section(l1_picks)
 
     st.markdown("---")
     render_summary_metrics(backtest["summary"], backtest["horizon_days"])

@@ -63,8 +63,8 @@ TW_FEE_DISCOUNT = 1.0   # 折扣 (1.0 = 不打折)
 HIST_DAYS_DEFAULT = 365 * 3  # 3 年
 
 # FinMind 投信買超門檻（張）
-FINMIND_NET_BUY_THRESHOLD = 200
-FINMIND_POSITIVE_DAYS_REQUIRED = 3
+FINMIND_NET_BUY_THRESHOLD = 100
+FINMIND_POSITIVE_DAYS_REQUIRED = 2
 FINMIND_LOOKBACK_DAYS = 5
 
 # v2.1：大盤指數對應
@@ -389,9 +389,17 @@ class GlobalValidator:
         result.reasons.append(rs_msg)
         result.score += rs_delta
 
-        # 第 2 層：確認
+        # 第 2 層：確認（台股優先看籌碼，FinMind 失敗則 fallback 用爆量）
         if market == "TW":
             conf_ok, conf_msg = self._check_chips_tw(real or symbol, eval_date)
+            if not conf_ok and ("不可用" in conf_msg or "未安裝" in conf_msg
+                                or "FinMind error" in conf_msg or "無資料" in conf_msg):
+                vol_ok, vol_msg = self._check_volume_burst(df_daily_t)
+                if vol_ok:
+                    conf_ok = True
+                    conf_msg = f"⚠️ FinMind 不可用 → 改用爆量：{vol_msg}"
+                else:
+                    conf_msg = f"{conf_msg} / {vol_msg}"
         else:
             conf_ok, conf_msg = self._check_volume_burst(df_daily_t)
         result.reasons.append(conf_msg)
@@ -530,16 +538,18 @@ class GlobalValidator:
         return False, f"⏳ 投信買盤未達標（淨買 {net} 張、正買 {pos}/{FINMIND_LOOKBACK_DAYS}）"
 
     def _check_volume_burst(self, df_daily: pd.DataFrame) -> tuple[bool, str]:
-        if len(df_daily) < 11:
+        # v2.4：看「過去 5 日內任一天爆量」，門檻 1.1x（比 1.2x 寬鬆）
+        if len(df_daily) < 15:
             return False, "⚪ 量能資料不足"
-        last_vol = df_daily["Volume"].iloc[-1]
-        avg10 = df_daily["Volume"].iloc[-11:-1].mean()
+        # 5~15 日前的均量當基準
+        avg10 = df_daily["Volume"].iloc[-15:-5].mean()
         if avg10 == 0 or pd.isna(avg10):
             return False, "⚪ 無有效均量"
-        ratio = last_vol / avg10
-        if ratio >= 1.2:
-            return True, f"✅ 爆量攻擊（量 / 10 期均量 = {ratio:.2f}x）"
-        return False, f"⏳ 量能未爆發（{ratio:.2f}x < 1.2x）"
+        recent_5 = df_daily["Volume"].iloc[-5:]
+        max_ratio = float((recent_5 / avg10).max())
+        if max_ratio >= 1.1:
+            return True, f"✅ 近 5 日內爆量（峰值 / 10 期均量 = {max_ratio:.2f}x）"
+        return False, f"⏳ 近 5 日量能未爆發（峰值 {max_ratio:.2f}x < 1.1x）"
 
 
 # ============================================================
